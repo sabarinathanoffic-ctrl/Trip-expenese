@@ -800,7 +800,7 @@ const GoogleSheets = {
     syncTrip: async (trip) => {
         if (!state.settings.sheetId || !state.settings.apiKey) return;
 
-        const values = [trip.id, trip.name, trip.destination, trip.startDate, trip.endDate, trip.budget, new Date().toISOString()];
+        const values = [trip.id, trip.name, trip.destination, trip.startDate, trip.endDate, trip.budget, new Date().toISOString(), JSON.stringify(trip.members || [])];
 
         if (state.settings.scriptUrl) {
             try {
@@ -810,7 +810,7 @@ const GoogleSheets = {
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
                         sheetName: 'Trips',
-                        headers: ['ID', 'Name', 'Destination', 'Start Date', 'End Date', 'Budget', 'Created At'],
+                        headers: ['ID', 'Name', 'Destination', 'Start Date', 'End Date', 'Budget', 'Created At', 'Members'],
                         values: values
                     })
                 });
@@ -820,7 +820,7 @@ const GoogleSheets = {
         }
 
         try {
-            const range = 'Trips!A:G';
+            const range = 'Trips!A:H';
             await fetch(`${CONFIG.SHEETS_API_URL}/${state.settings.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&key=${state.settings.apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -871,20 +871,28 @@ const GoogleSheets = {
 
         try {
             // Load Trips
-            const tripsRes = await fetch(`${CONFIG.SHEETS_API_URL}/${state.settings.sheetId}/values/Trips!A2:G?key=${state.settings.apiKey}`);
+            const tripsRes = await fetch(`${CONFIG.SHEETS_API_URL}/${state.settings.sheetId}/values/Trips!A2:H?key=${state.settings.apiKey}`);
             const tripsData = await tripsRes.json();
 
             if (tripsData.values) {
-                const trips = tripsData.values.map(row => ({
-                    id: row[0],
-                    name: row[1],
-                    destination: row[2],
-                    startDate: row[3],
-                    endDate: row[4],
-                    budget: row[5],
-                    createdAt: row[6],
-                    members: []
-                }));
+                const trips = tripsData.values.map(row => {
+                    let members = [];
+                    try {
+                        members = row[7] ? JSON.parse(row[7]) : [];
+                    } catch (e) {
+                        console.error('Error parsing members JSON:', e);
+                    }
+                    return {
+                        id: row[0],
+                        name: row[1],
+                        destination: row[2],
+                        startDate: row[3],
+                        endDate: row[4],
+                        budget: row[5],
+                        createdAt: row[6],
+                        members: members
+                    };
+                });
 
                 trips.forEach(t => {
                     const idx = state.trips.findIndex(local => local.id === t.id);
