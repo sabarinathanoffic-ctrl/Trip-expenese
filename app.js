@@ -24,7 +24,7 @@ let state = {
         apiKey: 'AIzaSyB8T6LYI1RdykRL2TIqDDFJqM_lEOfZOJ8',
         scriptUrl: 'https://script.google.com/macros/s/AKfycbw_5i7Bj2yOL1pueWNqCgFnDalkEBeUCpFN4CfwwZ1LDxUEHBiJRx3Vo7NO_d6aOPRK/exec',
         geminiApiKey: '',
-        weatherApiKey: ''
+        weatherApiKey: 'bd5e378503939ddaee76f12ad7a97608'
     }
 };
 
@@ -171,6 +171,7 @@ const Storage = {
             if (!state.settings.scriptUrl || state.settings.scriptUrl.includes('AKfycbxACN2_JUMNquUze_9LoYODigDwxB_22ItQnwDS3J1WbzYCh2ABj_4WZOx2C1vgeRh3')) {
                 state.settings.scriptUrl = 'https://script.google.com/macros/s/AKfycbw_5i7Bj2yOL1pueWNqCgFnDalkEBeUCpFN4CfwwZ1LDxUEHBiJRx3Vo7NO_d6aOPRK/exec';
             }
+            if (!state.settings.weatherApiKey) state.settings.weatherApiKey = 'bd5e378503939ddaee76f12ad7a97608';
         }
     },
 

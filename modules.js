@@ -896,8 +896,17 @@ const GoogleSheets = {
 
                 trips.forEach(t => {
                     const idx = state.trips.findIndex(local => local.id === t.id);
-                    if (idx !== -1) state.trips[idx] = { ...state.trips[idx], ...t };
-                    else state.trips.push(t);
+                    if (idx !== -1) {
+                        const existing = state.trips[idx];
+                        state.trips[idx] = {
+                            ...existing,
+                            ...t,
+                            // Only overwrite members if cloud data actually has members or if local is empty
+                            members: (t.members && t.members.length > 0) ? t.members : (existing.members && existing.members.length > 0 ? existing.members : [])
+                        };
+                    } else {
+                        state.trips.push(t);
+                    }
                 });
             }
 
